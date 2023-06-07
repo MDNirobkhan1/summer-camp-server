@@ -27,7 +27,12 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const clessesCollection =client.db('photography-school').collection('clesses');
 
+    app.get('/clesses', async(req, res)=>{
+        const result= await clessesCollection.find().toArray();
+        res.send(result)
+    })
 
 
 
