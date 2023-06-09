@@ -28,6 +28,7 @@ async function run() {
     await client.connect();
 
     const clessesCollection =client.db('photography-school').collection('clesses');
+    const cartCollection =client.db('photography-school').collection('carts');
 
     app.get('/clesses', async(req, res)=>{
         const result= await clessesCollection.find().toArray();
@@ -35,6 +36,14 @@ async function run() {
     })
 
 
+    // cart collection
+
+    app.post('/carts', async(req,res)=>{
+        const item = req.body;
+        console.log(item);
+        const result = await cartCollection.insertOne(item);
+        res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
