@@ -70,7 +70,22 @@ async function run() {
 
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result)
-        })
+        });
+
+        // instructor panel 
+
+        app.patch('/users/instructor/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updateDoc = {
+                $set: {
+                    inst: 'instructor'
+                },
+            };
+            
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.send(result)
+        });
         // cart collection
 
         app.get('/carts', async (req, res) => {
