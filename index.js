@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 require('dotenv').config();
-const stripe= require('stripe')(process.env.PAYMENT_SECRET_KEY)
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
 
 
@@ -30,6 +30,7 @@ async function run() {
 
         const clessesCollection = client.db('photography-school').collection('clesses');
         const cartCollection = client.db('photography-school').collection('carts');
+        const usersCollection = client.db('photography-school').collection('users');
 
         app.get('/clesses', async (req, res) => {
             const result = await clessesCollection.find().toArray();
@@ -37,6 +38,21 @@ async function run() {
         })
 
 
+
+        // user create  database 
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+
+            const query = { email: user.email }
+            const existingUser = await usersCollection.findOne(query)
+            if (existingUser) {
+                return res.send({ meassage: "user exists" })
+            }
+            const result = await usersCollection.insertOne(user);
+            res.send(result)
+            console.log(user);
+        })
         // cart collection
 
         app.get('/carts', async (req, res) => {
@@ -61,6 +77,21 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await cartCollection.deleteOne(query);
             res.send(result);
+        })
+
+        // create payment 
+
+        app.post('/create-payment-intent', async (req, res) => {
+            const { price } = req.body;
+            const amount = price * 100;
+            const paymentIntent = await stripe.paymentIntent.create({
+                amount: amount,
+                current: 'usd',
+                payment_methode_types: ['card']
+            })
+            res.send({
+                clientSecret: paymentIntent.client_secret
+            })
         })
 
         // Send a ping to confirm a successful connection
