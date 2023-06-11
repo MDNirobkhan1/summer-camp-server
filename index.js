@@ -57,12 +57,24 @@ async function run() {
         })
 
 
+        // varify admin warning 
+
+        const verifyAdmin = async (req, res, next) => {
+            const email = req.decoded.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            if (user?.role !== 'Admin') {
+                return res.status(403).send({ error: true, meassage: 'forbbiden meassage' })
+            }
+            next();
+        }
+
         app.get('/clesses', async (req, res) => {
             const result = await clessesCollection.find().toArray();
             res.send(result)
         })
 
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyJWT,verifyAdmin, async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
@@ -83,6 +95,19 @@ async function run() {
         })
 
         // admin handle panel 
+
+        app.get('/users/admin/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+
+            if (req.decoded.email !== email) {
+                res.send({ admin: false })
+            }
+
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            const result = { admin: user?.role === 'admin' }
+            res.send(result)
+        })
 
         app.patch('/users/admin/:id', async (req, res) => {
             const id = req.params.id;
