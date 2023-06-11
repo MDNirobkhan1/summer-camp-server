@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
@@ -31,6 +32,14 @@ async function run() {
         const clessesCollection = client.db('photography-school').collection('clesses');
         const cartCollection = client.db('photography-school').collection('carts');
         const usersCollection = client.db('photography-school').collection('users');
+
+
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+            res.send({ token })
+        })
+
 
         app.get('/clesses', async (req, res) => {
             const result = await clessesCollection.find().toArray();
@@ -72,6 +81,7 @@ async function run() {
             res.send(result)
         });
 
+
         // instructor panel 
 
         app.patch('/users/instructor/:id', async (req, res) => {
@@ -82,7 +92,7 @@ async function run() {
                     inst: 'instructor'
                 },
             };
-            
+
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.send(result)
         });
