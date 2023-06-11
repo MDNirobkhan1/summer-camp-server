@@ -74,7 +74,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/users', verifyJWT,verifyAdmin, async (req, res) => {
+        app.get('/users', verifyJWT, async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
@@ -174,7 +174,8 @@ async function run() {
         app.post('/create-payment-intent', async (req, res) => {
             const { price } = req.body;
             const amount = price * 100;
-            const paymentIntent = await stripe.paymentIntent.create({
+            // console.log(price);
+            const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount,
                 current: 'usd',
                 payment_methode_types: ['card']
