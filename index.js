@@ -159,16 +159,16 @@ app.patch('/users/instructor/:id', async (req, res) => {
 });
 // cart collection
 
-app.get('/carts', verifyJWT, async (req, res) => {
+app.get('/carts', async (req, res) => {
     const email = req.query.email;
-    if (!email) {
-        res.send([])
-    }
+    // if (!email) {
+    //     res.send([])
+    // }
 
-    const decodedEmail = req.decoded.email;
-    if (email !== decodedEmail) {
-        return res.status(403).send({ error: true, meassage: 'forbbiden access' })
-    }
+    // const decodedEmail = req.decoded.email;
+    // if (email !== decodedEmail) {
+    //     return res.status(403).send({ error: true, meassage: 'forbbiden access' })
+    // }
 
     const query = { email: email };
     const result = await cartCollection.find(query).toArray();
